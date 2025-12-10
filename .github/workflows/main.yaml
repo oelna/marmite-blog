@@ -22,15 +22,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout 🛎
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install marmite 🫙
+      - name: Install marmite
         run: cargo install marmite
 
-      - name: Build site 🏗️
+      - name: Build site
         run: marmite . site --debug
 
+      - name: Inject commit SHA into HTML
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          find . \( -iname \*.html -o -iname \*.css \) -print0 \
+            | xargs -0 sed -i "s|</body>|<!-- ${SHORT_SHA} -->\n</body>|g"
+            
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
